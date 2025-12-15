@@ -73,5 +73,27 @@ public class DealServiceTest {
         verify(dealRepository, times(1)).save(any(Deal.class)); // only valid deal should be saved
     }
 
+    @Test
+    public void ShouldHandleUnexpectedDatabaseCrash() {
+        DealRequestDTO validDeal = DealRequestDTO.builder()
+                .dealUniqueId("DEAL-CRASH")
+                .fromCurrencyIso("MAD")
+                .toCurrencyIso("JOD")
+                .dealAmount(BigDecimal.TEN)
+                .dealTimestamp(LocalDateTime.now())
+                .build();
+
+        when(dealRepository.existsByDealUniqueId("DEAL-VALID")).thenReturn(false);
+        doThrow(new RuntimeException("Database connection lost")).when(dealRepository).save(any(Deal.class));
+
+
+        ImportSummaryDTO summary = dealService.importDeals(List.of(validDeal));
+
+        assertEquals(0, summary.getSuccessCount());
+        assertEquals(1, summary.getFailureCount());
+
+        assertEquals("DEAL-CRASH: Database connection lost", summary.getErrorMessages().get(0));
+    }
+
 
 }
