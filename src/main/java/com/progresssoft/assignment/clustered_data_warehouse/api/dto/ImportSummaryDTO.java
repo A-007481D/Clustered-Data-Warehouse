@@ -15,9 +15,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImportSummaryDTO {
-    private Integer totalProcessed;
-    private Integer successCount;
-    private Integer failureCount;
+    private int totalProcessed;
+    private int successCount;
+    private int failureCount;
 
     private LocalDateTime processEndTime;
 
