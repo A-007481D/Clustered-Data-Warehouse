@@ -7,9 +7,9 @@
 ```mermaid
 classDiagram
     class Deal {
-        +String dealUniqueId
-        +String fromCurrencyIso
-        +String toCurrencyIso
-        +LocalDateTime dealTimestamp
-        +BigDecimal dealAmount
+        -String dealUniqueId
+        -String fromCurrencyIso
+        -String toCurrencyIso
+        -LocalDateTime dealTimestamp
+        -BigDecimal dealAmount
     }
