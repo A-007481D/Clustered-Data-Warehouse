@@ -17,6 +17,29 @@ import java.util.List;
 public class DealService {
     private final DealRepository dealRepository;
 
+    public ImportSummaryDTO importDeals(List<DealRequestDTO> dealRequests) {
+
+        ImportSummaryDTO summary = new ImportSummaryDTO();
+        summary.setTotalProcessed(dealRequests.size());
+
+        log.info("Starting import of {} deals ", dealRequests.size());
+
+        for(DealRequestDTO requestDTO : dealRequests) {
+            try {
+                processSingleDeal(requestDTO);
+                summary.incrementSuccess();
+
+            }catch(Exception e) {
+                log.error("Failed to impoert deal {}: {}", requestDTO.getDealUniqueId(), e.getMessage());
+                summary.addEerror(requestDTO.getDealUniqueId() + ": " + e.getMessage());
+            }
+        }
+
+        log.info("Import completed TOTAL : {}, SUCCESS: {}, FAILED {}", summary.getTotalProcessed(), summary.getSuccessCount(), summary.getFailureCount());
+
+        return summary;
+    }
+
     public void processSingleDeal(DealRequestDTO request){
         log.info("Processing single deal: {}", request);
 
