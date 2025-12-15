@@ -13,7 +13,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -40,6 +42,35 @@ public class DealServiceTest {
         dealService.processSingleDeal(request);
         verify(dealRepository, times(1)).save(any(Deal.class));
 
+    }
+
+
+    @Test
+    public void shouldHandleBatchFailureWithoutRollback(){
+        DealRequestDTO validDeal = DealRequestDTO.builder()
+                .dealUniqueId("DEALL-VALID")
+                .fromCurrencyIso("MAD")
+                .toCurrencyIso("JOD")
+                .dealAmount(BigDecimal.TEN)
+                .dealTimestamp(LocalDateTime.now())
+                .build();
+
+        DealRequestDTO duplicateDeal = DealRequestDTO.builder()
+                .dealUniqueId("DEAL-DUPLICATE")
+                .fromCurrencyIso("USD")
+                .toCurrencyIso("EUR")
+                .dealAmount(BigDecimal.ONE).dealTimestamp(LocalDateTime.now())
+                .build();
+
+        when(dealRepository.existsByDealUniqueId("DEALL-VALID")).thenReturn(false);
+        when(dealRepository.existsByDealUniqueId("DEAL-DUPLICATE")).thenReturn(true); // should trigger failure
+
+        ImportSummaryDTO summary = dealService.importDeals(List.of(validDeal, duplicateDeal));
+
+        assertEquals(1, summary.getSuccessCount(), "should have 1 successful import");
+        assertEquals(1, summary.getFailureCount(), "should have 1 failed import");
+
+        verify(dealRepository, times(1)).save(any(Deal.class)); // only valid deal should be saved
     }
 
 
