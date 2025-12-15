@@ -29,7 +29,7 @@ public class DealServiceTest {
     public void shouldSuccessfullyImportOneDeal(){
 
         DealRequestDTO request =  DealRequestDTO.builder()
-                .dealUniqueId("")
+                .dealUniqueId("DEAL-001")
                 .fromCurrencyIso("MAD")
                 .toCurrencyIso("USD")
                 .dealAmount(BigDecimal.TEN)
