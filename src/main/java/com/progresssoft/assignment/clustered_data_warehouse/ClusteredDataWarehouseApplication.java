@@ -1,4 +1,4 @@
-package com.progressoft.assignment.clustered_data_warehouse;
+package com.progresssoft.assignment.clustered_data_warehouse;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
