@@ -1,6 +1,6 @@
-package com.progressoft.assignment.clustered_data_warehouse.repository;
+package com.progresssoft.assignment.clustered_data_warehouse.repository;
 
-import com.progressoft.assignment.clustered_data_warehouse.model.Deal;
+import com.progresssoft.assignment.clustered_data_warehouse.model.Deal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

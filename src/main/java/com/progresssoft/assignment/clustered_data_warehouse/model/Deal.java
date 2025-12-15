@@ -1,4 +1,4 @@
-package com.progressoft.assignment.clustered_data_warehouse.model;
+package com.progresssoft.assignment.clustered_data_warehouse.model;
 
 
 import jakarta.persistence.*;
