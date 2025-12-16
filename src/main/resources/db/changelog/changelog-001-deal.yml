@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet: 
+      id: 1-create-deal-table
+      author: A-007481D
+      changes:
+        - createTable:
+            tableName: deals
+            columns:
+              - column:
+                  name: deal_unique_id
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                    name: from_currency_iso
+                    type: varchar(3)
+                    constraints:
+                        nullable: false
+
+              - column:
+                    name: to_currency_iso
+                    type: varchar(3)
+                    constraints:
+                      nullable: false
+
+              - column:
+                  name: deal_amount
+                  type: decimal(19,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: deal_timestamp
+                  type: timestamp
+                  constraints:
+                    nullable: false
