@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,7 +37,7 @@ public class DealService {
         }
 
         log.info("Import completed TOTAL : {}, SUCCESS: {}, FAILED {}", summary.getTotalProcessed(), summary.getSuccessCount(), summary.getFailureCount());
-
+        summary.setProcessEndTime(LocalDateTime.now());
         return summary;
     }
 
