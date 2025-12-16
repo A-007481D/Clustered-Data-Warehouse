@@ -27,11 +27,11 @@ public class DealController {
     private final DealService dealService;
 
     @PostMapping
-    public ResponseEntity<String> importDeals(@RequestBody List< @Valid DealRequestDTO> dealRequests) {
+    public ResponseEntity<ImportSummaryDTO> importDeals(@RequestBody List< @Valid DealRequestDTO> dealRequests) {
 
         log.info("Recieved request to import {} deals ", dealRequests.size());
         ImportSummaryDTO summary = dealService.importDeals(dealRequests);
-        return ResponseEntity.ok().body(summary.getErrorMessages().get(0));
+        return ResponseEntity.ok(summary);
     }
 
 
