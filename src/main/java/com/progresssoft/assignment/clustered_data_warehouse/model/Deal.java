@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 public class Deal {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "deal_unique_id", unique = true, nullable = false)
     private String dealUniqueId;
 
     private String fromCurrencyIso;
