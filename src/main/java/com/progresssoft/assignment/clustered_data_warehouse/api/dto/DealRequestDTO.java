@@ -2,6 +2,7 @@ package com.progresssoft.assignment.clustered_data_warehouse.api.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -29,9 +30,11 @@ public class DealRequestDTO {
     @Size(min = 3,  max = 3 , message = "TO currency ISO must be exactly 3 characters long")
     private String toCurrencyIso;
 
+    @NotNull(message = "Deal amount is required")
     @Positive(message = "deal amount must be > 0")
     private BigDecimal dealAmount;
 
+    @NotNull(message = "Deal timestamp is required")
     private LocalDateTime dealTimestamp;
 
 
