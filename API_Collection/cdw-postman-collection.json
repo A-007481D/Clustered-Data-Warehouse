@@ -1,0 +1,252 @@
+{
+  "info": {
+    "_postman_id": "c9284386-8888-4444-9999-123456789abc",
+    "name": "Clustered Data Warehouse Tests",
+    "description": "Quick Test suite. Covers Happy Path, Idempotency, No-Rollback, and Validation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Happy Path - Import Valid Deals",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "",
+              "pm.test(\"All deals processed successfully\", function () {",
+              "    pm.expect(jsonData.successCount).to.eql(2);",
+              "    pm.expect(jsonData.failureCount).to.eql(0);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n    {\n        \"dealUniqueId\": \"DEAL-001\",\n        \"fromCurrencyIso\": \"JOD\",\n        \"toCurrencyIso\": \"USD\",\n        \"dealTimestamp\": \"2025-12-16T10:00:00\",\n        \"dealAmount\": 1500.00\n    },\n    {\n        \"dealUniqueId\": \"DEAL-002\",\n        \"fromCurrencyIso\": \"EUR\",\n        \"toCurrencyIso\": \"USD\",\n        \"dealTimestamp\": \"2025-12-16T10:05:00\",\n        \"dealAmount\": 2500.50\n    }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/deals",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "deals"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Idempotency - Detect Duplicates",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "",
+              "pm.test(\"Deals rejected as duplicates\", function () {",
+              "    pm.expect(jsonData.failureCount).to.be.above(0);",
+              "    pm.expect(jsonData.errorMessages[0]).to.include(\"already exists\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n    {\n        \"dealUniqueId\": \"DEAL-001\",\n        \"fromCurrencyIso\": \"JOD\",\n        \"toCurrencyIso\": \"USD\",\n        \"dealTimestamp\": \"2025-12-16T10:00:00\",\n        \"dealAmount\": 1500.00\n    }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/deals",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "deals"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. No Rollback - Partial Success",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "",
+              "pm.test(\"Valid deal saved\", function () {",
+              "    pm.expect(jsonData.successCount).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"Duplicate deal rejected\", function () {",
+              "    pm.expect(jsonData.failureCount).to.eql(1);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n    {\n        \"dealUniqueId\": \"DEAL-NEW-003\",\n        \"fromCurrencyIso\": \"GBP\",\n        \"toCurrencyIso\": \"USD\",\n        \"dealTimestamp\": \"2025-12-16T12:00:00\",\n        \"dealAmount\": 500.00\n    },\n    {\n        \"dealUniqueId\": \"DEAL-001\",\n        \"fromCurrencyIso\": \"JOD\",\n        \"toCurrencyIso\": \"USD\",\n        \"dealTimestamp\": \"2025-12-16T10:00:00\",\n        \"dealAmount\": 1500.00\n    }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/deals",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "deals"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Validation - Missing Fields",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "",
+              "pm.test(\"Error contains validation details\", function () {",
+              "    // Adjust based on your GlobalExceptionHandler response format",
+              "    // Usually it returns a Map, so we check if keys exist",
+              "    pm.expect(JSON.stringify(jsonData)).to.include(\"dealAmount\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n    {\n        \"dealUniqueId\": \"DEAL-BROKEN\",\n        \"fromCurrencyIso\": \"JOD\",\n        \"toCurrencyIso\": \"USD\",\n        \"dealTimestamp\": \"2025-12-16T10:00:00\"\n        // Missing dealAmount\n    }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/deals",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "deals"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Validation - Invalid Data Types",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n    {\n        \"dealUniqueId\": \"DEAL-INVALID-AMT\",\n        \"fromCurrencyIso\": \"JOD\",\n        \"toCurrencyIso\": \"USD\",\n        \"dealTimestamp\": \"2025-12-16T10:00:00\",\n        \"dealAmount\": -100.00\n    }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/deals",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "deals"
+          ]
+        }
+      }
+    }
+  ]
+}
